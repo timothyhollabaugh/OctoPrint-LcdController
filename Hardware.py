@@ -81,7 +81,7 @@ def update():
     pin = "green"
     gpio.output(oPins[pin], outputs[pin])
     
-    f = open("/home/pi/lcdcontroller/printerPower", "r+")
+    f = open("/home/pi/OctoPrint-LcdController/printerPower", "r+")
     p = f.read()
 
     if p.find("1") > -1:
