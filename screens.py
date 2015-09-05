@@ -1,4 +1,3 @@
-from lcd import Lcd
 from hurry import filesize
 
 import logging
@@ -7,11 +6,10 @@ import time
 import datetime
 import Printer
 import Hardware
+import Lcd
 
 class Screen():
     'Base screen'
-    
-    lcd = Lcd()
     
     lines = [[" " for i in range(0, 20)] for k in range(0, 4)]
 
@@ -27,19 +25,19 @@ class Screen():
         self.lines = [[" " for i in range(0, 20)] for k in range(0, 4)]
     
     def init(self):
-        self.lcd.clear()
+        Lcd.clear()
     
     def update(self):
-        self.lines[0] = list(str(self.title).center(self.lcd.width))
+        self.lines[0] = list(str(self.title).center(Lcd.width))
         self.lines[1] = list(str(time.strftime("%I:%M:%S")))
     
     def nextScreen(self):
         return self.screenId
 
     def draw(self):
-        for line in range(0, self.lcd.height):
-            self.lcd.setCur(0, line)
-            self.lcd.write("".join(self.lines[line]))
+        for line in range(0, Lcd.height):
+            Lcd.setCur(0, line)
+            Lcd.write("".join(self.lines[line]))
 
 class PrintScreen(Screen):
     'Screen to display print info'
@@ -47,18 +45,18 @@ class PrintScreen(Screen):
     lines = [[" " for i in range(0, 20)] for k in range(0, 4)]
 
     def update(self):
-        self.lines[0] = list(str(self.title).center(self.lcd.width))
-        self.lines[1] = list(str(Printer.state).ljust(self.lcd.width))
+        self.lines[0] = list(str(self.title).center(Lcd.width))
+        self.lines[1] = list(str(Printer.state).ljust(Lcd.width))
         
         if not Printer.cfile == None:
-            self.lines[2] = list(str(Printer.cfile).ljust(self.lcd.width))
+            self.lines[2] = list(str(Printer.cfile).ljust(Lcd.width))
         else:
             self.lines[2] = list("                    ")
     
         if not Printer.printTimeLeft == None:
             m, s = divmod(int(Printer.printTimeLeft), 60)
             h, m = divmod(m, 60)
-            self.lines[3] = list(str("%02d:%02d:%02d" % (h, m, s)).ljust(self.lcd.width))
+            self.lines[3] = list(str("%02d:%02d:%02d" % (h, m, s)).ljust(Lcd.width))
         else:
             self.lines[3] = list("                    ")
     
@@ -89,7 +87,7 @@ class ListScreen(Screen):
         self.options = options
     
     def update(self):
-        self.lines[0] = list(str(self.title).center(self.lcd.width))
+        self.lines[0] = list(str(self.title).center(Lcd.width))
         
         if Hardware.buttons["up"] and self.curPos > 0:
             self.curPos = self.curPos - 1
@@ -99,17 +97,17 @@ class ListScreen(Screen):
                 self.selPos = self.selPos - 1
         if Hardware.buttons["down"] and self.curPos < len(self.options)-1:
             self.curPos = self.curPos + 1
-            if self.curPos > self.scrPos + self.lcd.height - 2:
+            if self.curPos > self.scrPos + Lcd.height - 2:
                 self.scrPos = self.scrPos + 1
             else:
                 self.selPos = self.selPos + 1
         
-        for i in range(0, self.lcd.height-1):
+        for i in range(0, Lcd.height-1):
             if i+self.scrPos <= len(self.options)-1:
                 if i == self.selPos:
-                    self.lines[i+1] = (">%s" % self.options[i+self.scrPos][1]).ljust(self.lcd.width)
+                    self.lines[i+1] = (">%s" % self.options[i+self.scrPos][1]).ljust(Lcd.width)
                 else:
-                    self.lines[i+1] = (" %s" % self.options[i+self.scrPos][1]).ljust(self.lcd.width)
+                    self.lines[i+1] = (" %s" % self.options[i+self.scrPos][1]).ljust(Lcd.width)
 
     def nextScreen(self):
         if Hardware.buttons["back"]:
@@ -155,7 +153,7 @@ class TempScreen(Screen):
     tool = 0
 
     def update(self):
-        self.lines[0] = list(self.title.center(self.lcd.width))
+        self.lines[0] = list(self.title.center(Lcd.width))
         
         self.tools = []
 
@@ -219,10 +217,10 @@ class TempChangeScreen(Screen):
         self.temp = int(Printer.temperatures[self.tool]["target"])
 
     def update(self):
-        self.lines[0] = list(self.tool.center(self.lcd.width))
-        self.lines[1] = list("+10".center(self.lcd.width))
-        self.lines[2] = list("-1 {: =3d} +1".format(self.temp).center(self.lcd.width))
-        self.lines[3] = list("-10".center(self.lcd.width))
+        self.lines[0] = list(self.tool.center(Lcd.width))
+        self.lines[1] = list("+10".center(Lcd.width))
+        self.lines[2] = list("-1 {: =3d} +1".format(self.temp).center(Lcd.width))
+        self.lines[3] = list("-10".center(Lcd.width))
 
         if Hardware.buttons["up"]:
             self.temp = self.temp + 10
@@ -274,26 +272,26 @@ class FileInfoScreen(Screen):
         if "gcodeAnalysis" in f and not f["gcodeAnalysis"]["estimatedPrintTime"] == None:
             m, s = divmod(int(f["gcodeAnalysis"]["estimatedPrintTime"]), 60)
             h, m = divmod(m, 60)
-            time = list(str("%02d:%02d:%02d" % (h, m, s)).center(self.lcd.width/2))
+            time = list(str("%02d:%02d:%02d" % (h, m, s)).center(Lcd.width/2))
         else:
-            time = list("".center(self.lcd.width/2))
+            time = list("".center(Lcd.width/2))
         
         if not f["size"] == None:
             s = filesize.size(int(str(f["size"])))
-            size = list(str(s).center(self.lcd.width/2))
+            size = list(str(s).center(Lcd.width/2))
         else:
-            size = list("".center(self.lcd.width/2))
+            size = list("".center(Lcd.width/2))
         
         if not f["date"] == None:
             d = datetime.datetime.fromtimestamp(int(f["date"])).strftime('%m/%d/%Y')
-            date = list(d.center(self.lcd.width/2))
+            date = list(d.center(Lcd.width/2))
         else:
-            date = list("".center(self.lcd.width/2))
+            date = list("".center(Lcd.width/2))
         
         if not f["origin"] == None:
-            orig = list(str(f["origin"]).center(self.lcd.width/2))
+            orig = list(str(f["origin"]).center(Lcd.width/2))
         else:
-            orig = list("".center(self.lcd.width/2))
+            orig = list("".center(Lcd.width/2))
 
         self.lines[1] = time+date
         self.lines[2] = size+orig
@@ -340,26 +338,26 @@ class FileInfoScreen(Screen):
         if "gcodeAnalysis" in f and not f["gcodeAnalysis"]["estimatedPrintTime"] == None:
             m, s = divmod(int(f["gcodeAnalysis"]["estimatedPrintTime"]), 60)
             h, m = divmod(m, 60)
-            time = list(str("%02d:%02d:%02d" % (h, m, s)).center(self.lcd.width/2))
+            time = list(str("%02d:%02d:%02d" % (h, m, s)).center(Lcd.width/2))
         else:
-            time = list("".center(self.lcd.width/2))
+            time = list("".center(Lcd.width/2))
         
         if not f["size"] == None:
             s = filesize.size(int(str(f["size"])))
-            size = list(str(s).center(self.lcd.width/2))
+            size = list(str(s).center(Lcd.width/2))
         else:
-            size = list("".center(self.lcd.width/2))
+            size = list("".center(Lcd.width/2))
         
         if not f["date"] == None:
             d = datetime.datetime.fromtimestamp(int(f["date"])).strftime('%m/%d/%Y')
-            date = list(d.center(self.lcd.width/2))
+            date = list(d.center(Lcd.width/2))
         else:
-            date = list("".center(self.lcd.width/2))
+            date = list("".center(Lcd.width/2))
         
         if not f["origin"] == None:
-            orig = list(str(f["origin"]).center(self.lcd.width/2))
+            orig = list(str(f["origin"]).center(Lcd.width/2))
         else:
-            orig = list("".center(self.lcd.width/2))
+            orig = list("".center(Lcd.width/2))
 
         self.lines[1] = time+date
         self.lines[2] = size+orig

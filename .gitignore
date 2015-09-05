@@ -1,3 +1,12 @@
+# Log file
+log.txt
+
+# Pidfile
+*.pid
+
+# Emacs backup files
+*~
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

@@ -1,4 +1,3 @@
-
 import logging
 import RPi.GPIO as gpio
 

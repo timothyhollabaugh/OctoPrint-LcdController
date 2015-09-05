@@ -1,12 +1,10 @@
-from lcd import Lcd
 from screens import *
 
 import logging
 import Printer
 import Hardware
 import thread
-
-lcd = Lcd()
+import Lcd
 
 screens = {
     "mainScreen": PrintScreen("mainScreen", "mainScreen", "Tricolour Mendel"), 
@@ -75,7 +73,7 @@ def start():
     screens["outlet"].setOptions(outletOptions)
 
     logging.debug("Clearing LCD")
-    lcd.clear()
+    Lcd.clear()
 
     logging.debug("Initing Hardware")
     Hardware.init()

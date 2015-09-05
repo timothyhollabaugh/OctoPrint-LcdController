@@ -13,7 +13,6 @@
 # Description:       Octoprint LCD Contrller
 ### END INIT INFO
 
-#th
 #After placing this script in /etc/init.d run this command:
 #sudo update-rc.d lcd defaults
 
@@ -22,12 +21,10 @@
 
 PATH=/home/pi/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 
-LCDPATH=/home/pi/lcdcontroller
+LCDPATH=/home/pi/OctoPrint-LcdController
 NAME=LcdController
 
-PYTHON=/home/pi/octoprint/venv/bin/python
 DAEMON=$LCDPATH/lcdController.py
-#DAEMON=$LCDPATH/a.out
 PIDPATH=$LCDPATH/$NAME.pid
 DESC="Octoprint Lcd Controller"
 
@@ -38,7 +35,7 @@ start() {
 }
 
 stop() {
-	start-stop-daemon --verbose --stop --pidfile $PIDPATH #--exec $DAEMON
+	start-stop-daemon --verbose --stop --pidfile $PIDPATH
 	rm -f $PIDPATH
 }
 
