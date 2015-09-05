@@ -1,0 +1,80 @@
+#! /bin/sh
+#
+# Copied this stuff from /etc/sinit.d/saned
+### BEGIN INIT INFO
+# Provides:          lcdcontroller
+# Required-Start:    $syslog $remote_fs $octoprint
+# Required-Stop:     $syslog $remote_fs
+# Should-Start:      $network
+# Should-Stop:       $network
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: Octoprint LCD Contrller
+# Description:       Octoprint LCD Contrller
+### END INIT INFO
+
+#th
+#After placing this script in /etc/init.d run this command:
+#sudo update-rc.d lcd defaults
+
+#If removing from init.d then remove this file and run:
+#update-rc.d lcd remove
+
+PATH=/home/pi/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+
+LCDPATH=/home/pi/lcdcontroller
+NAME=LcdController
+
+PYTHON=/home/pi/octoprint/venv/bin/python
+DAEMON=$LCDPATH/lcdController.py
+#DAEMON=$LCDPATH/a.out
+PIDPATH=$LCDPATH/$NAME.pid
+DESC="Octoprint Lcd Controller"
+
+set -e
+
+start() {
+	start-stop-daemon --chdir $LCDPATH --chuid root --verbose --start --background --pidfile $PIDPATH --make-pidfile --startas $DAEMON
+}
+
+stop() {
+	start-stop-daemon --verbose --stop --pidfile $PIDPATH #--exec $DAEMON
+	rm -f $PIDPATH
+}
+
+case "$1" in
+  start)
+	start
+	;;
+  stop)
+	stop
+	;;
+  restart|force-reload)
+	stop
+	sleep 1
+	start
+	;;
+  status)
+	if test -s $PIDPATH
+	then
+		RUNNING=$(cat $PIDPATH)
+		if test -d /proc/$RUNNING
+		then
+			echo "$NAME is running."
+		else
+			echo "$NAME is not running, but $PIDPATH existed."
+			rm -f $PIDPATH
+		fi
+	else
+		rm -f $PIDPATH
+		echo "$NAME not running."
+	fi
+	exit 1
+	;;
+  *)
+	N=/etc/init.d/$NAME
+	echo "Usage: $N {start|stop|restart|status}" >&2
+	exit 1
+	;;
+esac
+exit 0
