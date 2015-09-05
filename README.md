@@ -26,19 +26,19 @@ Wire the LCD to +5v, ground, and serial TX on the Pi
 
 Wire each of the buttons from their GPIO pin to ground as follows:
 
-  up: 15
-  down: 21
-  left: 19
-  right: 12
-  enter: 13
-  back: 16
+- up: 15
+- down: 21
+- left: 19
+- right: 12
+- enter: 13
+- back: 16
 
-Wire the LEDs through the resistors to their GPIO pin and ground, and wire the relay like [this](https://github.com/foosel/OctoPrint/wiki/Controlling-a-relay-board-from-your-RPi), but to the following pins:
+Wire the LEDs through the resistors from their GPIO pin to ground, and wire the relay like [this](https://github.com/foosel/OctoPrint/wiki/Controlling-a-relay-board-from-your-RPi), but to the following pins:
 
-led1: 22
-led2: 18
-printer relay: 7
-outlet relay: 11
+- led1: 22
+- led2: 18
+- printer relay: 7
+- outlet relay: 11
 
 All pins can be changed in `Hardware.py`
 
@@ -72,4 +72,5 @@ echo 1 > printerPower
 </pre>
 
 By default, a log is stored in `log.txt`. It can be changed in `lcdContoller.py`
+
 By default, the serial port `/dev/ttyAMA0` is used for the display. It can be changed in `Lcd.py`
